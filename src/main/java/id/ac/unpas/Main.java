@@ -1,17 +1,36 @@
 package id.ac.unpas;
 
+import javax.swing.*;
+
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        // 1. OPSI: Cek Koneksi Database Dulu (Buat Debugging)
+        if (Database.getConnection() != null) {
+            System.out.println("Aplikasi Siap: Database Terhubung!");
+        } else {
+            System.out.println("Aplikasi Error: Database Gagal!");
         }
+
+        // 2. OPSI: Ganti Tampilan Biar Gak Kaku (Pakai Nimbus LookAndFeel)
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Kalau gagal, pakai default aja (gak masalah)
+        }
+
+        // 3. JALANKAN APLIKASI (Buka LoginView)
+        SwingUtilities.invokeLater(() -> {
+            // Kita panggil LoginView sebagai pintu masuk
+            LoginView login = new LoginView();
+            login.setVisible(true);
+        });
     }
 }
