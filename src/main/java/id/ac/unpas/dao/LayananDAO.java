@@ -6,7 +6,7 @@ package id.ac.unpas.dao;
 
 /**
  *
- * @author Ilona Aqila Zahra
+ * @author Ariska Putri
  */
 
 import id.ac.unpas.config.Database;
