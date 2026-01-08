@@ -17,20 +17,22 @@ public class Database {
     private static Connection connection;
 
     public static Connection getConnection() {
-        if (connection == null) {
-            try {
-                // Register JDBC driver (opsional untuk versi baru, tapi bagus untuk memastikan)
+        try {
+            // PERBAIKAN DI SINI:
+            // Cek apakah connection null ATAU connection sudah tertutup (isClosed)
+            if (connection == null || connection.isClosed()) {
+
+                // Register JDBC driver
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(DB_URL, USER, PASS);
-                System.out.println("Koneksi Database Berhasil!");
-            } catch (ClassNotFoundException | SQLException e) {
-                System.err.println("Koneksi Database Gagal: " + e.getMessage());
+                System.out.println("Koneksi Database Berhasil (Reconnected)!");
             }
+        } catch (ClassNotFoundException | SQLException e) {
+            System.err.println("Koneksi Database Gagal: " + e.getMessage());
         }
         return connection;
     }
-    
-    // Method untuk menutup koneksi jika perlu
+
     public static void closeConnection() {
         if (connection != null) {
             try {

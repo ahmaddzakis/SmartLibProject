@@ -16,10 +16,10 @@ import id.ac.unpas.model.Layanan;
 import id.ac.unpas.model.Pelanggan;
 import id.ac.unpas.model.Transaksi;
 import id.ac.unpas.view.TransaksiView;
+
+import javax.swing.*;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 public class TransaksiController {
     private TransaksiView view;
@@ -157,18 +157,71 @@ public class TransaksiController {
     }
 
     // ... Method updateStatus, deleteData, cariData, resetForm, pilihBaris TETAP SAMA ...
-    
-    public void updateStatus() {
+
+    public void updateData() {
+        // 1. Validasi ID (Harus pilih baris dulu)
         if (view.getTxtId().getText().isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Pilih transaksi dari tabel dulu!");
+            JOptionPane.showMessageDialog(view, "Pilih data dari tabel terlebih dahulu!");
             return;
         }
-        int id = Integer.parseInt(view.getTxtId().getText());
-        String statusBaru = view.getComboStatus().getSelectedItem().toString();
-        transDAO.updateStatus(id, statusBaru);
-        JOptionPane.showMessageDialog(view, "Status berhasil diupdate!");
-        isiTabel();
-        resetForm();
+
+        // 2. Ambil Data dari Form
+        Pelanggan pelanggan = (Pelanggan) view.getComboPelanggan().getSelectedItem();
+        Layanan layanan = (Layanan) view.getComboLayanan().getSelectedItem();
+        String status = (String) view.getComboStatus().getSelectedItem();
+
+        // Ambil teks berat dan ganti koma jadi titik (jika ada)
+        String beratStr = view.getTxtBerat().getText().replace(",", ".");
+
+        // 3. Validasi Input Kosong / Data Null
+        if (pelanggan == null || layanan == null || beratStr.isEmpty()) {
+            JOptionPane.showMessageDialog(view, "Data tidak boleh kosong!");
+            return;
+        }
+
+        // --- TAMBAHKAN TRY-CATCH UNTUK MENANGKAP ERROR ANGKA/DATABASE ---
+        try {
+            // 4. Hitung Ulang Total Harga
+            double berat = Double.parseDouble(beratStr);
+
+            // Cek jika berat negatif
+            if (berat <= 0) {
+                JOptionPane.showMessageDialog(view, "Berat harus lebih dari 0!");
+                return;
+            }
+
+            int totalHarga = (int) (berat * layanan.getHargaPerKg());
+
+            // Update tampilan Total Harga
+            view.getTxtTotal().setText(String.valueOf(totalHarga));
+
+            // 5. Bungkus ke Objek Transaksi
+            Transaksi t = new Transaksi();
+            t.setIdTransaksi(Integer.parseInt(view.getTxtId().getText()));
+
+            t.setIdPelanggan(pelanggan.getIdPelanggan());
+            t.setIdLayanan(layanan.getIdLayanan());
+
+            t.setBerat(berat);
+            t.setTotalHarga(totalHarga);
+            t.setStatus(status);
+
+            // 6. Kirim ke DAO
+            transDAO.updateStatus(t);
+
+            JOptionPane.showMessageDialog(view, "Data Transaksi Berhasil Diubah Lengkap!");
+            resetForm();
+            isiTabel();
+
+        } catch (NumberFormatException e) {
+            // Error ini muncul jika "Berat" isinya huruf atau format salah
+            JOptionPane.showMessageDialog(view, "Kolom Berat harus berupa ANGKA!\n(Gunakan titik untuk desimal)");
+            e.printStackTrace();
+        } catch (Exception e) {
+            // Error lain (Database, Koneksi, dll)
+            JOptionPane.showMessageDialog(view, "Terjadi Error: " + e.getMessage());
+            e.printStackTrace(); // Lihat detail error merah di bawah (Console)
+        }
     }
 
     public void deleteData() {

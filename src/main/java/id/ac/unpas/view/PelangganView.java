@@ -10,10 +10,11 @@ package id.ac.unpas.view;
  */
 
 import id.ac.unpas.controller.PelangganController;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import javax.swing.border.EmptyBorder;
 
 public class PelangganView extends JPanel {
    // Komponen UI
@@ -115,7 +116,12 @@ public class PelangganView extends JPanel {
         
         // Tabel
         String[] kolom = {"ID", "Nama", "No HP", "Alamat"};
-        tableModel = new DefaultTableModel(kolom, 0);
+        tableModel = new DefaultTableModel(kolom, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelPelanggan = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tabelPelanggan);
         

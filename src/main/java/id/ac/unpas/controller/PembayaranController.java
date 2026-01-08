@@ -14,11 +14,11 @@ import id.ac.unpas.dao.TransaksiDAO;
 import id.ac.unpas.model.Pembayaran;
 import id.ac.unpas.model.Transaksi;
 import id.ac.unpas.view.PembayaranView;
-import java.awt.Color;
+
+import javax.swing.*;
+import java.awt.*;
 import java.text.MessageFormat;
 import java.util.List;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
 
 public class PembayaranController {
    private PembayaranView view;
@@ -117,7 +117,7 @@ public class PembayaranController {
             bayarDAO.insert(p);
             
             // 4. Update Status Transaksi jadi 'selesai' (Opsional tapi bagus)
-            transDAO.updateStatus(p.getIdTransaksi(), "selesai");
+            transDAO.updateStatusOnly(p.getIdTransaksi(), "selesai");
 
             // 5. Beri Kembalian & Reset
             int kembalian = bayar - tagihan;

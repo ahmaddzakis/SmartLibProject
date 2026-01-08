@@ -157,7 +157,12 @@ public class PembayaranView extends JPanel {
 
         // --- 4. TABEL RIWAYAT ---
         String[] kolom = {"ID Bayar", "Kode Nota", "Metode", "Jml Bayar", "Status", "Tgl Bayar"};
-        tableModel = new DefaultTableModel(kolom, 0);
+        tableModel = new DefaultTableModel(kolom, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelPembayaran = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tabelPembayaran);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Riwayat Pembayaran"));

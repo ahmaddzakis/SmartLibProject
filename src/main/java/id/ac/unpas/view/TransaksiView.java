@@ -12,13 +12,14 @@ package id.ac.unpas.view;
 import id.ac.unpas.controller.TransaksiController;
 import id.ac.unpas.model.Layanan;
 import id.ac.unpas.model.Pelanggan;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import javax.swing.border.EmptyBorder;
 
 public class TransaksiView extends JPanel {
-   // Komponen
+    // Komponen
     private JTextField txtId, txtNota, txtBerat, txtTotal, txtCari;
     private JComboBox<Pelanggan> comboPelanggan;
     private JComboBox<Layanan> comboLayanan;
@@ -26,16 +27,16 @@ public class TransaksiView extends JPanel {
     private JButton btnSimpan, btnUbahStatus, btnHapus, btnReset, btnCari, btnHitung;
     private JTable tabelTransaksi;
     private DefaultTableModel tableModel;
-    
+
     private TransaksiController controller;
 
     public TransaksiView() {
         // Setup Layout & Padding Konsisten
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 20, 10, 20)); // Jarak pinggir 20px
-        
+
         initComponents();
-        
+
         controller = new TransaksiController(this);
         controller.isiComboData();
         controller.isiTabel();
@@ -88,10 +89,10 @@ public class TransaksiView extends JPanel {
         txtTotal.setBackground(new Color(240, 240, 240));
         txtTotal.setFont(new Font("Segoe UI", Font.BOLD, 12));
         panelInput.add(txtTotal);
-        
+
         // 6. Status
         panelInput.add(new JLabel("Status Laundry:"));
-        // Status 'antri' sudah dihapus sesuai request sebelumnya
+        // Status 'antri' dihapus, start dari 'proses'
         String[] statusList = {"proses", "selesai", "diambil"};
         comboStatus = new JComboBox<>(statusList);
         comboStatus.setEnabled(false);
@@ -103,10 +104,10 @@ public class TransaksiView extends JPanel {
         // B. PANEL TOMBOL
         JPanel panelTombol = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnSimpan = new JButton("Simpan Transaksi Baru");
-        btnUbahStatus = new JButton("Update Status");
+        btnUbahStatus = new JButton("Ubah Data"); // Ganti teksnya
         btnHapus = new JButton("Hapus");
         btnReset = new JButton("Reset");
-        
+
         panelTombol.add(btnSimpan);
         panelTombol.add(btnUbahStatus);
         panelTombol.add(btnHapus);
@@ -116,7 +117,7 @@ public class TransaksiView extends JPanel {
         JPanel formWrapper = new JPanel(new BorderLayout());
         formWrapper.add(panelInput, BorderLayout.CENTER);
         formWrapper.add(panelTombol, BorderLayout.SOUTH);
-        
+
         contentPanel.add(formWrapper, BorderLayout.NORTH);
 
         // C. PANEL TABEL & CARI
@@ -124,19 +125,30 @@ public class TransaksiView extends JPanel {
         panelBawah.setBorder(new EmptyBorder(20, 0, 0, 0)); // Jarak dari form
 
         JPanel panelCari = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // --- BAGIAN YANG DIUBAH ---
+        panelCari.add(new JLabel("Cari Nota / Pelanggan:")); // 1. Tambah Label
+
         txtCari = new JTextField(20);
-        btnCari = new JButton("Cari Nota/Pelanggan");
         panelCari.add(txtCari);
+
+        btnCari = new JButton("Cari"); // 2. Tombol jadi lebih pendek
         panelCari.add(btnCari);
+        // --------------------------
 
         String[] kolom = {"ID", "Nota", "Pelanggan", "Layanan", "Berat", "Total", "Status", "Tgl Masuk"};
-        tableModel = new DefaultTableModel(kolom, 0);
+        tableModel = new DefaultTableModel(kolom, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelTransaksi = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tabelTransaksi);
 
         panelBawah.add(panelCari, BorderLayout.NORTH);
         panelBawah.add(scrollPane, BorderLayout.CENTER);
-        
+
         contentPanel.add(panelBawah, BorderLayout.CENTER);
 
         // Add Content Panel ke Center Utama
@@ -145,7 +157,7 @@ public class TransaksiView extends JPanel {
         // --- EVENTS ---
         btnHitung.addActionListener(e -> controller.hitungHarga());
         btnSimpan.addActionListener(e -> controller.insertData());
-        btnUbahStatus.addActionListener(e -> controller.updateStatus());
+        btnUbahStatus.addActionListener(e -> controller.updateData());
         btnHapus.addActionListener(e -> controller.deleteData());
         btnReset.addActionListener(e -> controller.resetForm());
         btnCari.addActionListener(e -> controller.cariData());

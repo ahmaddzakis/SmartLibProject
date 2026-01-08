@@ -10,10 +10,11 @@ package id.ac.unpas.view;
  */
 
 import id.ac.unpas.controller.LayananController;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import javax.swing.border.EmptyBorder;
 
 public class LayananView extends JPanel {
 private JTextField txtId, txtNama, txtHarga, txtCari;
@@ -107,7 +108,12 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         panelCari.add(btnCari);
 
         String[] kolom = {"ID", "Nama Layanan", "Harga/Kg", "Estimasi (Hari)"};
-        tableModel = new DefaultTableModel(kolom, 0);
+        tableModel = new DefaultTableModel(kolom, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelLayanan = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tabelLayanan);
 
