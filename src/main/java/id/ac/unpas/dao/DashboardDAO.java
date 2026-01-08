@@ -13,8 +13,13 @@ public class DashboardDAO {
     // 1. Hitung Pemasukan Hari Ini
     public int getPemasukanHarian() {
         int total = 0;
-        // Menggunakan COALESCE agar jika hasil NULL (tidak ada data), dianggap 0
-        String sql = "SELECT COALESCE(SUM(total_harga), 0) FROM transaksi WHERE DATE(tgl_masuk) = CURDATE()";
+
+        // REVISI LOGIKA:
+        // Menambahkan: AND (status = 'selesai' OR status = 'diambil')
+        // Artinya: Hanya hitung total_harga jika cucian sudah beres/lunas.
+        String sql = "SELECT COALESCE(SUM(total_harga), 0) FROM transaksi " +
+                "WHERE DATE(tgl_masuk) = CURDATE() " +
+                "AND (status = 'selesai' OR status = 'diambil')";
 
         try (Connection conn = Database.getConnection();
              Statement st = conn.createStatement();

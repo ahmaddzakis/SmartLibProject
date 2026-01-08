@@ -17,13 +17,13 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class LayananView extends JPanel {
-private JTextField txtId, txtNama, txtHarga, txtCari;
+    private JTextField txtId, txtNama, txtHarga, txtCari;
     private JButton btnSimpan, btnUbah, btnHapus, btnReset, btnCari;
     private JTable tabelLayanan;
     private DefaultTableModel tableModel;
-    
-    // Variabel Spinner untuk angka
-    private JSpinner txtEstimasi; 
+
+    // PERBAIKAN 1: Ganti nama variabel biar jelas ini Spinner, bukan Textfield
+    private JSpinner spinnerEstimasi;
 
     private LayananController controller;
 
@@ -31,9 +31,9 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         // Setup Layout Utama & Padding Pinggir (Biar rapi)
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(10, 20, 10, 20)); // Memberi jarak 20px kiri-kanan
-        
+
         initComponents();
-        
+
         controller = new LayananController(this);
         controller.isiTabel();
     }
@@ -44,7 +44,7 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         lblJudul.setFont(new Font("Segoe UI", Font.BOLD, 24));
         lblJudul.setForeground(new Color(50, 50, 50));
         lblJudul.setBorder(new EmptyBorder(0, 0, 20, 0)); // Jarak bawah judul
-        
+
         // Pasang Judul di Atas Utama
         add(lblJudul, BorderLayout.NORTH);
 
@@ -65,15 +65,16 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         panelInput.add(txtHarga);
 
         panelInput.add(new JLabel("Estimasi Selesai (Hari):"));
-        
+
         // Setup JSpinner (Agar input hari pakai tombol naik/turun)
-        txtEstimasi = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
-        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) txtEstimasi.getEditor();
+        // PERBAIKAN 2: Inisialisasi variabel spinnerEstimasi
+        spinnerEstimasi = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+        JSpinner.DefaultEditor editor = (JSpinner.DefaultEditor) spinnerEstimasi.getEditor();
         editor.getTextField().setHorizontalAlignment(JTextField.CENTER);
         editor.getTextField().setEditable(false);
 
-        panelInput.add(txtEstimasi);
-        
+        panelInput.add(spinnerEstimasi);
+
 
         // ID Sembunyi
         txtId = new JTextField();
@@ -85,12 +86,12 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         btnUbah = new JButton("Ubah");
         btnHapus = new JButton("Hapus");
         btnReset = new JButton("Reset");
-        
+
         panelTombol.add(btnSimpan);
         panelTombol.add(btnUbah);
         panelTombol.add(btnHapus);
         panelTombol.add(btnReset);
-        
+
         // Gabung Input & Tombol dalam satu Wrapper
         JPanel formWrapper = new JPanel(new BorderLayout());
         formWrapper.add(panelInput, BorderLayout.CENTER);
@@ -99,7 +100,7 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
         // C. PANEL TABEL & CARI
         JPanel panelBawah = new JPanel(new BorderLayout(0, 10)); // Gap vertical 10
         panelBawah.setBorder(new EmptyBorder(20, 0, 0, 0)); // Jarak dari form ke tabel
-        
+
         JPanel panelCari = new JPanel(new FlowLayout(FlowLayout.LEFT));
         txtCari = new JTextField(20);
         btnCari = new JButton("Cari");
@@ -145,10 +146,13 @@ private JTextField txtId, txtNama, txtHarga, txtCari;
     public JTextField getTxtId() { return txtId; }
     public JTextField getTxtNama() { return txtNama; }
     public JTextField getTxtHarga() { return txtHarga; }
-    
-    // Perbaikan: Return JSpinner, bukan JTextField
-    public JSpinner getTxtEstimasi() { return txtEstimasi; }
-    
+
+    // PERBAIKAN 3: Ganti nama Getter agar sesuai dengan Controller
+    // Controller memanggil: view.getSpinnerEstimasi()
+    public JSpinner getSpinnerEstimasi() {
+        return spinnerEstimasi;
+    }
+
     public JTextField getTxtCari() { return txtCari; }
     public JTable getTabelLayanan() { return tabelLayanan; }
     public DefaultTableModel getTableModel() { return tableModel; }
