@@ -16,9 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LayananDAO {
-    // HAPUS VARIABEL GLOBAL: private Connection conn ...
+    // 1. INSERT (Simpan Data Baru)
+    public void insert(Layanan l) {
+        // PERBAIKAN: Ganti 'harga' jadi 'harga_per_kg'
+        String sql = "INSERT INTO layanan (nama_layanan, harga_per_kg, estimasi_hari) VALUES (?, ?, ?)";
 
-    // READ
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, l.getNamaLayanan());
+            ps.setInt(2, l.getHargaPerKg());
+            ps.setInt(3, l.getEstimasiHari());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2. READ (Ambil Semua Data)
     public List<Layanan> getAll() {
         List<Layanan> list = new ArrayList<>();
         String sql = "SELECT * FROM layanan ORDER BY nama_layanan ASC";
@@ -31,17 +48,16 @@ public class LayananDAO {
                 Layanan l = new Layanan();
                 l.setIdLayanan(rs.getInt("id_layanan"));
                 l.setNamaLayanan(rs.getString("nama_layanan"));
-                // Pastikan nama kolom di DB kamu benar (harga / harga_per_kg)
-                // Disini saya pakai asumsi nama kolomnya 'harga_per_kg' atau 'harga'
-                // Sesuaikan string di dalam rs.getInt("...") dengan tabelmu
+
+                // PERBAIKAN: Ambil dari kolom 'harga_per_kg'
                 try {
                     l.setHargaPerKg(rs.getInt("harga_per_kg"));
                 } catch (SQLException ex) {
-                    // Fallback kalau nama kolomnya 'harga'
+                    // Jaga-jaga kalau namanya beda lagi
                     l.setHargaPerKg(rs.getInt("harga"));
                 }
 
-                l.setEstimasiHari(rs.getInt("estimasi_hari")); // Kolom estimasi_hari
+                l.setEstimasiHari(rs.getInt("estimasi_hari"));
                 list.add(l);
             }
         } catch (SQLException e) {
@@ -50,40 +66,27 @@ public class LayananDAO {
         return list;
     }
 
-    // CREATE
-    public void insert(Layanan l) {
-        String sql = "INSERT INTO layanan (nama_layanan, harga, estimasi_hari) VALUES (?, ?, ?)";
-        // Note: Cek nama kolom di DB mu, apakah 'harga' atau 'harga_per_kg'
-        // Jika DB mu pakai 'harga_per_kg', ganti query di atas.
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, l.getNamaLayanan());
-            ps.setInt(2, l.getHargaPerKg());
-            ps.setInt(3, l.getEstimasiHari());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // UPDATE
+    // 3. UPDATE (Ubah Data)
     public void update(Layanan l) {
-        String sql = "UPDATE layanan SET nama_layanan=?, harga=?, estimasi_hari=? WHERE id_layanan=?";
+        // PERBAIKAN: Ganti 'harga' jadi 'harga_per_kg'
+        String sql = "UPDATE layanan SET nama_layanan=?, harga_per_kg=?, estimasi_hari=? WHERE id_layanan=?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, l.getNamaLayanan());
             ps.setInt(2, l.getHargaPerKg());
             ps.setInt(3, l.getEstimasiHari());
             ps.setInt(4, l.getIdLayanan());
+
             ps.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // DELETE
+    // 4. DELETE (Hapus Data)
     public void delete(int id) {
         String sql = "DELETE FROM layanan WHERE id_layanan=?";
         try (Connection conn = Database.getConnection();
@@ -95,13 +98,14 @@ public class LayananDAO {
         }
     }
 
-    // SEARCH
+    // 5. SEARCH (Cari Data)
     public List<Layanan> search(String keyword) {
         List<Layanan> list = new ArrayList<>();
         String sql = "SELECT * FROM layanan WHERE nama_layanan LIKE ?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, "%" + keyword + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -109,7 +113,10 @@ public class LayananDAO {
                     Layanan l = new Layanan();
                     l.setIdLayanan(rs.getInt("id_layanan"));
                     l.setNamaLayanan(rs.getString("nama_layanan"));
-                    try { l.setHargaPerKg(rs.getInt("harga_per_kg")); } catch (SQLException ex) { l.setHargaPerKg(rs.getInt("harga")); }
+
+                    try { l.setHargaPerKg(rs.getInt("harga_per_kg")); }
+                    catch (SQLException ex) { l.setHargaPerKg(rs.getInt("harga")); }
+
                     l.setEstimasiHari(rs.getInt("estimasi_hari"));
                     list.add(l);
                 }
